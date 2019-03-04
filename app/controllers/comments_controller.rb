@@ -8,6 +8,7 @@
 #  article_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  user_id    :integer
 #
 
 class CommentsController < ApplicationController
@@ -76,12 +77,17 @@ class CommentsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_comment
-      @comment = Comment.find(params[:id])
+      begin
+        @comment = Comment.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        flash[:alert] = "The comment you're looking for cannot be found"
+        redirect_to comments_path
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def comment_params
-      params.require(:comment).permit(:message, :visible, :article_id)
+      params.require(:comment).permit(:message, :visible, :article_id, :user_id)
       # Students, make sure to add the user_id and article ID parameter as symbols here ^^^^^^
     end
 end
